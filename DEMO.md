@@ -109,15 +109,31 @@
     - Because we're running tests in docker file, if nothing changes, we won't rerun tests. (Not necessarily bad)
     - Our build agent doesn't know about .net. This could just as easily be a python application, ruby, Go, whatever. If the agent can execute docker, then it can run the dockerfile
 
+* I can even deploy to Azure Container Registry, and I'll do that so I can access this from somewhere else:
+    docker login qglunchandlearn.azurecr.io -u QGLunchAndLearn -p rPx=8xNKgQEd0dr1RgeKdkfm9pItUV2Z
+    image="qglunchandlearn.azurecr.io/generator:ci-%build.number%"
+    docker build -t $image .
 
+    docker push $image
 
+* Pull an image
+    - docker pull qglunchandlearn.azurecr.io/generator:ci-x
+* Run image 
+    - docker run --rm -it -p 8080:80 qglunchandlearn.azurecr.io/generator:ci-x
+* Now we'll use the pipeline
+    - Update Startup.cs to have a new title
+* Commit source and push to repository
+* Allow to build in TeamCity
+* Check Azure Container Registry for new image
+* Pull an image
+    - docker pull qglunchandlearn.azurecr.io/generator:ci-x
+* Run image 
+    - docker run --rm -it -p 8090:80 qglunchandlearn.azurecr.io/generator:ci-x
 
+## Cleanup ##
 
+* Clean up containers
+    - docker rm xxxx
 
-
--- start up teamcity
--- start up repository
--- add project to teamcity
--- add project to github
--- add build project to teamcity
--- deploy to registry in automated fashion
+* Clean up images
+    - docker images rm xxxx
