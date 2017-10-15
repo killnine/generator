@@ -63,9 +63,86 @@
 
 ## Demo 4 - ##
 
--- start up teamcity
--- start up repository
--- add project to teamcity
--- add project to github
--- add build project to teamcity
--- deploy to registry in automated fashion
+** May want to clear out the teamcity container before doing this
+
+* cd infrastructure/registry
+* docker-compose up -d
+* navigate to http://localhost:55000/v2/_catalog to show the repository
+* edit hosts file to alias registry (as admin!):
+    -  notepad C:\Windows\System32\drivers\etc\hosts
+
+* cd ..
+* cd teamcity
+* run 'code docker-compose.yml'
+* docker-compose up
+* navigate to http://localhost:8111
+* authorize the agent
+
+* Within teamcity, create a new project using URL: https://github.com/killnine/generator
+* Add a build step using 'Command Line Runner'
+* Put 'docker version' into custom script 
+    - This will call out to docker version on the agent
+    - Should see server version and client.
+* Update VCS to point to branch for 'demo'
+
+* Update the build script
+    image="my-registry:55000/generator:ci-%build.number%"
+    docker build -t $image .
+* Show that the image now shows up in our repository listing 
+    docker image ls
+* Show that there's now an image in the registry too:
+    http://my-registry:55000/v2/_catalog
+    http://my-registry:55000/v2/generator/tags/list
+* Note that this will take up room on the build server so probably want to remove the images afterward and clean them up.
+
+* Open Range.cs in the Controllers section of the source
+* Comment out the ordering
+* Commit to demo branch with message "Testing auto-build process (fails)"
+* Click on button in VSCode to push source
+* Build should start in TeamCity and fail
+* Show log and the failed test. This is because of the TEAMCITY_PROJECT_NAME environment variable being 'fake', which ties into xunit
+    - This is only for xUnit runner
+    - This is only for the build stage and wont exist in runtime stage
+* Add ordering back and commit to demo branch with message "Testing auto-build process (pass)"
+* Click on button in VSCode to push source
+* Summarize
+    - Because we're running tests in docker file, if nothing changes, we won't rerun tests. (Not necessarily bad)
+    - Our build agent doesn't know about .net. This could just as easily be a python application, ruby, Go, whatever. If the agent can execute docker, then it can run the dockerfile
+
+* I can even deploy to Azure Container Registry, and I'll do that so I can access this from somewhere else:
+    docker login qglunchandlearn.azurecr.io -u QGLunchAndLearn -p rPx=8xNKgQEd0dr1RgeKdkfm9pItUV2Z
+    image="qglunchandlearn.azurecr.io/generator:ci-%build.number%"
+    docker build -t $image .
+
+    docker push $image
+
+* Pull an image
+    - docker pull qglunchandlearn.azurecr.io/generator:ci-x
+* Run image 
+    - docker run --rm -it -p 8080:80 qglunchandlearn.azurecr.io/generator:ci-x
+* Now we'll use the pipeline
+    - Update Startup.cs to have a new title
+* Commit source and push to repository
+* Allow to build in TeamCity
+* Check Azure Container Registry for new image
+* Pull an image
+    - docker pull qglunchandlearn.azurecr.io/generator:ci-x
+* Run image 
+    - docker run --rm -it -p 8090:80 qglunchandlearn.azurecr.io/generator:ci-x
+
+## Demo 5 - DC/OS ##
+
+* eval `ssh-agent -s`
+* 'ssh-add -l'
+*  ssh-add myPrivateKey_rsa
+* ssh qgadmin@qgorchestratormgmt.centralus.cloudapp.azure.com -p 2200 -L 8000:localhost:80
+* Connect to http://localhost:8000
+
+
+## Cleanup ##
+
+* Clean up containers
+    - docker rm xxxx
+
+* Clean up images
+    - docker images rm xxxx
