@@ -130,6 +130,15 @@
 * Run image 
     - docker run --rm -it -p 8090:80 qglunchandlearn.azurecr.io/generator:ci-x
 
+## Demo 5 - DC/OS ##
+
+* eval `ssh-agent -s`
+* 'ssh-add -l'
+*  ssh-add myPrivateKey_rsa
+* ssh qgadmin@qgorchestratormgmt.centralus.cloudapp.azure.com -p 2200 -L 8000:localhost:80
+* Connect to http://localhost:8000
+
+
 ## Cleanup ##
 
 * Clean up containers
