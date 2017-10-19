@@ -21,11 +21,11 @@ namespace api.test
         public void SortShouldOrderResults()
         {
             var range = new Range { Count = 4, Sort = true};
-            var values = new[] { "a", "c", "b", "f"};
+            var values = new[] { "a", "c", "b", "g"};
             var counter = 0;
             var generated = range.Of(() => values[counter++]);
 
-            Assert.Equal(new [] {"a", "b", "c", "f"}, generated.ToArray());
+            Assert.Equal(new [] {"a", "b", "c", "g"}, generated.ToArray());
         }
     }
 }

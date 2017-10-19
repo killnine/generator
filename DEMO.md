@@ -135,9 +135,9 @@
 * eval `ssh-agent -s`
 * 'ssh-add -l'
 *  ssh-add myPrivateKey_rsa
+
 * ssh qgadmin@qgorchestratormgmt.centralus.cloudapp.azure.com -p 2200 -L 8000:localhost:80
 * Connect to http://localhost:8000
-
 
 ## Cleanup ##
 
@@ -146,3 +146,7 @@
 
 * Clean up images
     - docker images rm xxxx
+
+* Delete container from docker hub
+* Delete container from azure container registry
+* Delete 'demo' branch from Github
